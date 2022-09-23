@@ -1,5 +1,5 @@
 # Final-Project-Template
-<!-- Edit the title above with your project title -->
+Finding Food Insecurity
 
 ## Installing Dependencies
 This assignment does not assume any particular setup. To install the dependencies, please run the command relevant to you're setup.

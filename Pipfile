@@ -7,6 +7,15 @@ name = "pypi"
 ipykernel = "*"
 jupyter = "*"
 notebook = "*"
+pandas = "*"
+openpyxl = "*"
+requests = "*"
+plotly = "*"
+plotly-geo = "*"
+geopandas = "*"
+numpy = "*"
+shapely = "*"
+pyshp = "*"
 
 [dev-packages]
 
