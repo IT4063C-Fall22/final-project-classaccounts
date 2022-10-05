@@ -43,7 +43,7 @@
 # 
 # The datasets I have identified can be used to get the information I need within my defined scope.
 
-# In[19]:
+# In[37]:
 
 
 #Imports needed for the notebook
@@ -52,11 +52,11 @@ import plotly.figure_factory as ff
 import requests
 
 
-# ## Cloropleth Map Example
+# ## Choropleth Map Example
 # 
-# This is part of what my answer would look like. Please note the dataset can map values based on FIPS codes. I would replace the values with FII by country FIPS
+# This is part of what my answer would look like. Please note the dataset can map values based on FIPS codes. I would replace the values with FII by county FIPS
 
-# In[20]:
+# In[38]:
 
 
 #This example was provided by plotly.com
@@ -78,7 +78,7 @@ fig.show()
 # * Dataset URL: https://www.census.gov/programs-surveys/cbp/data/datasets.html
 # * Documentation URL: https://www2.census.gov/programs-surveys/cbp/technical-documentation/records-layouts/2020_record_layouts/county-layout-2020.txt
 
-# In[21]:
+# In[39]:
 
 
 cbp = pd.read_csv("./datasources/cbp20co.txt")
@@ -93,7 +93,7 @@ cbp.head()
 # * Dataset URL: *You must create an account to access this*
 # * Documentation URL: https://www.feedingamerica.org/research/map-the-meal-gap/overall-executive-summary
 
-# In[22]:
+# In[40]:
 
 
 #Dataset 2, Source: (File)
@@ -111,7 +111,7 @@ mmg.describe()
 # * Dataset URL: https://api.census.gov/data/2022/cps/basic/apr
 # * Documentation URL: https://www.census.gov/data/developers/guidance/api-user-guide.html
 
-# In[23]:
+# In[41]:
 
 
 #Credit to Yahya Gilany course notes
@@ -128,7 +128,7 @@ census_data = pd.DataFrame.from_records(response.json()[1:], columns=response.js
 census_data.head()
 
 
-# In[24]:
+# In[42]:
 
 
 get_ipython().system('jupyter nbconvert --to python source.ipynb')
