@@ -29,7 +29,7 @@
 # 
 # I would be able to use the MMG dataset to identify the FII of each county. I can slice those visuals using the CPS dataset if I need to create reports based on a given demographic. When looking at correlated indicators related to FII, I will start with the CBP filtered dataset by grocery store NAICS codes and compare it to the MMG dataset joined on FIPS. I should be able to see trends of FII compared to trends in grocery store business spending and location patterns. I could also do this for other Census Housing/Income datasets and compare homelessness or income trends to FII by county or a higher level summary statistic of the country. I will also ensure I have to correct matching years for each dataset that they provide. However, only three datasets are required for this assignment at this time.
 # 
-# ## Prior Feeback
+# ## Prior Feedback
 # 
 # * *Is there enough data points that you'd be able to narrow the scope by that much?*
 # 
@@ -43,7 +43,7 @@
 # 
 # The datasets I have identified can be used to get the information I need within my defined scope.
 
-# In[13]:
+# In[19]:
 
 
 #Imports needed for the notebook
@@ -56,7 +56,7 @@ import requests
 # 
 # This is part of what my answer would look like. Please note the dataset can map values based on FIPS codes. I would replace the values with FII by country FIPS
 
-# In[14]:
+# In[20]:
 
 
 #This example was provided by plotly.com
@@ -78,7 +78,7 @@ fig.show()
 # * Dataset URL: https://www.census.gov/programs-surveys/cbp/data/datasets.html
 # * Documentation URL: https://www2.census.gov/programs-surveys/cbp/technical-documentation/records-layouts/2020_record_layouts/county-layout-2020.txt
 
-# In[15]:
+# In[21]:
 
 
 cbp = pd.read_csv("./datasources/cbp20co.txt")
@@ -93,7 +93,7 @@ cbp.head()
 # * Dataset URL: *You must create an account to access this*
 # * Documentation URL: https://www.feedingamerica.org/research/map-the-meal-gap/overall-executive-summary
 
-# In[16]:
+# In[22]:
 
 
 #Dataset 2, Source: (File)
@@ -111,7 +111,7 @@ mmg.describe()
 # * Dataset URL: https://api.census.gov/data/2022/cps/basic/apr
 # * Documentation URL: https://www.census.gov/data/developers/guidance/api-user-guide.html
 
-# In[17]:
+# In[23]:
 
 
 #Credit to Yahya Gilany course notes
@@ -128,7 +128,7 @@ census_data = pd.DataFrame.from_records(response.json()[1:], columns=response.js
 census_data.head()
 
 
-# In[18]:
+# In[24]:
 
 
 get_ipython().system('jupyter nbconvert --to python source.ipynb')
