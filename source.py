@@ -1,51 +1,65 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Project Title
-# Finding Food Insecurity
+# # Finding Food Insecurity
 
 # ## Topic
-# *What problem are you (or your stakeholder) trying to address?*
 # 
-# I am trying to address food insecurity in the united states and identify geographic areas where food programs like SNAP, WIC, NSLP, and TEFAP could be targeted. Those organizations typically allocate resources based on areas with the greatest need. It's important to address this issue to make sure the right communites are getting the right funding through these programs to alleviate many health disparities that are caused by poor nutrition and food insecurity.
+# I am trying to address food insecurity in the United States and identify geographic areas where food programs like the Supplemental Nutrition Assistance Program (SNAP), Special Supplemental Nutrition Program for Women (WIC),  National School Lunch Program (NSLP), and Emergency Food Assistance Program (TEFAP) could be targeted. Those organizations allocate funding based on geographic areas with the greatest need. It's essential to address this issue to ensure the right communities are getting the proper support through these programs to alleviate many health disparities caused by poor nutrition and food insecurity (FI).
 # 
 # 
 # ## Project Question
-# *What specific question are you seeking to answer with this project?*
-# *This is not the same as the questions you ask to limit the scope of the project.*
 # 
-# Which areas of the united states are most impacted by food insecurity, and whate indicators are closely linked to it?
-# 
-# I will determine the indicators as a progress and learn more about the project. A few indicators I have below would be overlayed by each counties FI. For example, on a line plot the FI of a given country would be overlayed by the trends of a busisness given x NAICS code. Or on a line plot the FI of a given country would be overlayed by the trends of residential income.
+# Which counties of the united states are most impacted by food insecurity, and what indicators like business patterns, houselessness, and income are correlated to it?*
 # 
 # ## What would an answer look like?
-# *What is your hypothesized answer to your question?*
 # 
-# See below an example of a chloropleth map. This would be the main deliverable. However, I would also deliver line graphs comparing other indicators to the FI rate of a given county over x years. 
+# The essential deliverable would be a choropleth map showing the food insecurity index (FII) rate of each country in the United States. I would also have supporting line charts showing the FII rates compared to other indicators like houselessness and business patterns (specifically grocery stores filtered by North American Industry Classification System (NAICS)). The great thing about relating my dataset using Federal Information Processing Standards (FIPS) is that I can incorporate more datasets to correlate them to the FII of each county. Therefore, I believe I could have multiple answers to my question depending on what indicator we want to look at through exploratory data analysis. Eventually, I would like to project food insecurity based on these indicators if I have the skills. However, that may be out of reach, given my current technical knowledge. But I can undoubtedly relate those indicators and likely correlate them to my FII per county.
 # 
 # 
 # ## Data Sources
-# *What 3 data sources have you identified for this project?*
 # 
-# I will be using the MMG, CBP, and CPS datasets. All of these are written below in the notebook as PoC.
+# I have identified three datasets for this project. I will incorporate more as this project progresses and relate them using FIPS codes.
 # 
-# *How are you going to relate these datasets?*
+# * Map the Meal Gap (MMG)
+# * County Business Patterns (CBP)
+# * Current Population Survey (CPS)
 # 
-# Since the most atomic part of my geographic granularity will be by county, I will use the FIPS code in each dataset to join them.
+# These datasets can be related using the FIPS code, which can indicate the county each row pertains to. All of these datasets I've imported contain a FIPS code. Therefore, I can join each of them using the county segment of the FIPS code.
 # 
-# *How will you use this data to answer your project question?*
+# I would be able to use the MMG dataset to identify the FII of each county. I can slice those visuals using the CPS dataset if I need to create reports based on a given demographic. When looking at correlated indicators related to FII, I will start with the CBP filtered dataset by grocery store NAICS codes and compare it to the MMG dataset joined on FIPS. I should be able to see trends of FII compared to trends in grocery store business spending and location patterns. I could also do this for other Census Housing/Income datasets and compare homelessness or income trends to FII by county or a higher level summary statistic of the country. I will also ensure I have to correct matching years for each dataset that they provide. However, only three datasets are required for this assignment at this time.
 # 
-# I will be able to provide geographic visuals sliced by food FII to create a geographic chlorepleth map with aiding line chart visuals of FI trends in relation to time and indication.
+# ## Prior Feeback
+# 
+# * *Is there enough data points that you'd be able to narrow the scope by that much?*
+# 
+# I have modified my scope to the county level inside the United States, and I can narrow it to this level using FIPS codes.
+# 
+# * *it seems that the project's scope is limited to descriptive analysis; I recommend digging a bit deeper and exploring other analysis types that might be helpful for this project.*
+# 
+# With my datasets I can do descriptive, predictive, exploratory, and inferential analysis. However, I really want to do predictive analyisis to find which countys may experience high FI in the future, but currently do not have the data analysis skills to do so.
+# 
+# * *you mentioned that you'd like to use "conformed dimensions from different datasets related to food insecurity". Are you able to identify some of those? if not the dataset itself, then a scope of what kind of information would like to get.*
+# 
+# The datasets I have identified can be used to get the information I need within my defined scope.
 
-# In[2]:
+# In[6]:
 
 
-#This example was provided from plotly.com
-
-#This is part of the What would an answer look like? 
-
-
+#Imports needed for the notebook21
+import pandas as pd
 import plotly.figure_factory as ff
+import requests
+
+
+# ## Cloropleth Map Example
+# 
+# This is part of what my answer would look like. Please note the dataset can map values based on FIPS codes. I would replace the values with FII by country FIPS
+
+# In[5]:
+
+
+#This example was provided by plotly.com
 fips = ['06021', '06023', '06027',
         '06029', '06033', '06059',
         '06047', '06049', '06051',
@@ -56,37 +70,50 @@ fig.layout.template = None
 fig.show()
 
 
-# In[4]:
+# ## Dataset #1 - County Business Patterns
+# 
+# This dataset is provided by the United States Census.
+# 
+# * Source Type: CSV (File)
+# * Dataset URL: https://www.census.gov/programs-surveys/cbp/data/datasets.html
+# * Documentation URL: https://www2.census.gov/programs-surveys/cbp/technical-documentation/records-layouts/2020_record_layouts/county-layout-2020.txt
 
+# In[2]:
 
-import pandas as pd
-#Dataset #1, Source: (File)
-#The source of this dataset is from the country business patterns, https://www.census.gov/programs-surveys/cbp/data/datasets.html,
-# https://www2.census.gov/programs-surveys/cbp/technical-documentation/records-layouts/2020_record_layouts/county-layout-2020.txt
 
 cbp = pd.read_csv("./datasources/cbp20co.txt")
-print(cbp.head())
+cbp.head()
 
 
-# In[5]:
+# ## Dataset #1 - Feeding America Map the Meal Gap
+# 
+# This dataset is provided by the United States Census.
+# 
+# * Source Type: Excel (File)
+# * Dataset URL: *You must create an account to access this*
+# * Documentation URL: https://www.feedingamerica.org/research/map-the-meal-gap/overall-executive-summary
+
+# In[3]:
 
 
 #Dataset 2, Source: (File)
 # https://www.feedingamerica.org/research/map-the-meal-gap/overall-executive-summary
-import pandas as pd
-
 mmg = pd.read_excel("./datasources/MMG2022_2020-2019Data_ToShare.xlsx", sheet_name="County")
-print(mmg.head())
-print(mmg.describe())
+mmg.head()
+mmg.describe()
 
 
-# In[5]:
+# ## Dataset #1 - Census Population Survey
+# 
+# This dataset is provided by the United States Census.
+# 
+# * Source Type: API
+# * Dataset URL: https://api.census.gov/data/2022/cps/basic/apr
+# * Documentation URL: https://www.census.gov/data/developers/guidance/api-user-guide.html
+
+# In[4]:
 
 
-import requests
-
-#Dataset #3, Source: (API)
-# JOIN the variables with a `/` separator https://api.census.gov/data/2022/cps/basic/apr
 #Credit to Yahya Gilany course notes
 
 HOST = "https://api.census.gov/data"
@@ -98,10 +125,10 @@ predicates = {}
 predicates["get"] = ",".join(dataset_variables) 
 response = requests.get(base_url, params=predicates)
 census_data = pd.DataFrame.from_records(response.json()[1:], columns=response.json()[0])
-print(census_data.head())
+census_data.head()
 
 
-# In[3]:
+# In[4]:
 
 
 get_ipython().system('jupyter nbconvert --to python source.ipynb')
