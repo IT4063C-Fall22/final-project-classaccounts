@@ -14,7 +14,7 @@
 # 
 # ## What would an answer look like?
 # 
-# The essential deliverable would be a choropleth map (code example included) showing the food insecurity index (FII) rate of each country in the United States. I would also have supporting line charts showing the FII rates compared to other indicators like houselessness and business patterns (specifically grocery stores filtered by North American Industry Classification System (NAICS)). The great thing about relating my dataset using Federal Information Processing Standards (FIPS) is that I can incorporate more datasets to correlate them to the FII of each county. Therefore, I believe I could have multiple answers to my question depending on what indicator correlated to FII we want to look at through exploratory data analysis. Eventually, I would like to project food insecurity based on these indicators if I have the skills. However, that may be out of reach, given my current technical knowledge. But I can undoubtedly relate those indicators and likely correlate them to my FII per county.
+# The essential deliverable would be a choropleth map (code example included) showing the food insecurity index (FII) rate of each country in the United States. I would also have supporting line charts showing the FII rates compared to other indicators like houselessness and business patterns (specifically grocery stores filtered by North American Industry Classification System (NAICS)). The great thing about relating my dataset using Federal Information Processing Standards (FIPS) is that I can incorporate more datasets to correlate them to the FII of each county. Therefore, I believe I could have multiple answers to my question depending on what indicator correlated to FII we want to look at through exploratory data analysis. This would allow me to create very concrete answers for my question. Eventually, I would like to project food insecurity based on these indicators if I have the skills. However, that may be out of reach, given my current technical knowledge. But I can undoubtedly relate those indicators and likely correlate them to my FII per county.
 # 
 # 
 # ## Data Sources
@@ -43,7 +43,7 @@
 # 
 # The datasets I have identified can be used to get the information I need within my defined scope.
 
-# In[37]:
+# In[43]:
 
 
 #Imports needed for the notebook
@@ -56,7 +56,7 @@ import requests
 # 
 # This is part of what my answer would look like. Please note the dataset can map values based on FIPS codes. I would replace the values with FII by county FIPS
 
-# In[38]:
+# In[44]:
 
 
 #This example was provided by plotly.com
@@ -78,7 +78,7 @@ fig.show()
 # * Dataset URL: https://www.census.gov/programs-surveys/cbp/data/datasets.html
 # * Documentation URL: https://www2.census.gov/programs-surveys/cbp/technical-documentation/records-layouts/2020_record_layouts/county-layout-2020.txt
 
-# In[39]:
+# In[45]:
 
 
 cbp = pd.read_csv("./datasources/cbp20co.txt")
@@ -93,7 +93,7 @@ cbp.head()
 # * Dataset URL: *You must create an account to access this*
 # * Documentation URL: https://www.feedingamerica.org/research/map-the-meal-gap/overall-executive-summary
 
-# In[40]:
+# In[46]:
 
 
 #Dataset 2, Source: (File)
@@ -111,7 +111,7 @@ mmg.describe()
 # * Dataset URL: https://api.census.gov/data/2022/cps/basic/apr
 # * Documentation URL: https://www.census.gov/data/developers/guidance/api-user-guide.html
 
-# In[41]:
+# In[47]:
 
 
 #Credit to Yahya Gilany course notes
@@ -128,7 +128,7 @@ census_data = pd.DataFrame.from_records(response.json()[1:], columns=response.js
 census_data.head()
 
 
-# In[42]:
+# In[48]:
 
 
 get_ipython().system('jupyter nbconvert --to python source.ipynb')
