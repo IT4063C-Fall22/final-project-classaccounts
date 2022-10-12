@@ -43,20 +43,25 @@
 # 
 # The datasets I have identified can be used to get the information I need within my defined scope.
 
-# In[43]:
+# In[423]:
 
 
 #Imports needed for the notebook
 import pandas as pd
 import plotly.figure_factory as ff
 import requests
+import plotly.express as px
+import plotly as plt
+from urllib.request import urlopen
+import json
+import seaborn as sns
 
 
-# ## Choropleth Map Example
+# ### Choropleth Map Example
 # 
 # This is part of what my answer would look like. Please note the dataset can map values based on FIPS codes. I would replace the values with FII by county FIPS
 
-# In[44]:
+# In[424]:
 
 
 #This example was provided by plotly.com
@@ -70,7 +75,7 @@ fig.layout.template = None
 fig.show()
 
 
-# ## Dataset #1 - County Business Patterns
+# ### Dataset #1 - County Business Patterns
 # 
 # This dataset is provided by the United States Census.
 # 
@@ -78,14 +83,14 @@ fig.show()
 # * Dataset URL: https://www.census.gov/programs-surveys/cbp/data/datasets.html
 # * Documentation URL: https://www2.census.gov/programs-surveys/cbp/technical-documentation/records-layouts/2020_record_layouts/county-layout-2020.txt
 
-# In[45]:
+# In[425]:
 
 
 cbp = pd.read_csv("./datasources/cbp20co.txt")
-cbp.head()
+cbp.sample(10)
 
 
-# ## Dataset #1 - Feeding America Map the Meal Gap
+# ### Dataset #1 - Feeding America Map the Meal Gap
 # 
 # This dataset is provided by the United States Census.
 # 
@@ -93,17 +98,25 @@ cbp.head()
 # * Dataset URL: *You must create an account to access this*
 # * Documentation URL: https://www.feedingamerica.org/research/map-the-meal-gap/overall-executive-summary
 
-# In[46]:
+# In[426]:
 
 
 #Dataset 2, Source: (File)
 # https://www.feedingamerica.org/research/map-the-meal-gap/overall-executive-summary
-mmg = pd.read_excel("./datasources/MMG2022_2020-2019Data_ToShare.xlsx", sheet_name="County")
-mmg.head()
-mmg.describe()
+mmg_df_20_and_19 = pd.read_excel("./datasources/MMG2022_2020-2019Data_ToShare.xlsx", sheet_name="County", header=1, converters={0: str})
+mmg_df_18 = pd.read_excel("./datasources/MMG2020_2018Data_ToShare.xlsx", sheet_name="2018 County", header=1, converters={0: str})
+mmg_df_17 = pd.read_excel("./datasources/MMG2019_2017Data_ToShare.xlsx", sheet_name="2017 County", header=1, converters={0: str})
+mmg_df_16 = pd.read_excel("./datasources/MMG2018_2016Data_ToShare.xlsx", sheet_name="2016 County", header=1, converters={0: str})
+mmg_df_15 = pd.read_excel("./datasources/MMG2017_2015Data_ToShare.xlsx", sheet_name="2015 County", header=1, converters={0: str})
+mmg_df_14 = pd.read_excel("./datasources/MMG2016_2014Data_ToShare.xlsx", sheet_name="2014 County", header=1, converters={0: str})
+mmg_df_13 = pd.read_excel("./datasources/MMG2015_2013Data_ToShare.xlsx", sheet_name="2013 County", header=1, converters={0: str})
+mmg_df_12 = pd.read_excel("./datasources/MMG2014_2012Data_ToShare.xlsx", sheet_name="2012 County", header=1, converters={0: str})
+mmg_df_11 = pd.read_excel("./datasources/MMG2013_2011Data_ToShare.xlsx", sheet_name="2011 County", header=1, converters={0: str})
+mmg_df_10 = pd.read_excel("./datasources/MMG2012_2010Data_ToShare.xlsx", sheet_name="County", header=1, converters={0: str})
 
 
-# ## Dataset #1 - Census Population Survey
+
+# ### Dataset #1 - Census Population Survey
 # 
 # This dataset is provided by the United States Census.
 # 
@@ -111,7 +124,7 @@ mmg.describe()
 # * Dataset URL: https://api.census.gov/data/2022/cps/basic/apr
 # * Documentation URL: https://www.census.gov/data/developers/guidance/api-user-guide.html
 
-# In[47]:
+# In[427]:
 
 
 #Credit to Yahya Gilany course notes
@@ -128,7 +141,163 @@ census_data = pd.DataFrame.from_records(response.json()[1:], columns=response.js
 census_data.head()
 
 
-# In[48]:
+# In[428]:
+
+
+#datset #4
+
+bls_df_10 = pd.read_excel("./datasources/laucnty10.xlsx", sheet_name="laucnty10", header=5, converters={1: str, 2: str})
+bls_df_11 = pd.read_excel("./datasources/laucnty11.xlsx", sheet_name="laucnty11", header=5, converters={1: str, 2: str})
+bls_df_12 = pd.read_excel("./datasources/laucnty12.xlsx", sheet_name="laucnty12", header=5, converters={1: str, 2: str})
+bls_df_13 = pd.read_excel("./datasources/laucnty13.xlsx", sheet_name="laucnty13", header=5, converters={1: str, 2: str})
+bls_df_14 = pd.read_excel("./datasources/laucnty14.xlsx", sheet_name="laucnty14", header=5, converters={1: str, 2: str})
+bls_df_15 = pd.read_excel("./datasources/laucnty15.xlsx", sheet_name="laucnty15", header=5, converters={1: str, 2: str})
+bls_df_16 = pd.read_excel("./datasources/laucnty16.xlsx", sheet_name="laucnty16", header=5, converters={1: str, 2: str})
+bls_df_17 = pd.read_excel("./datasources/laucnty17.xlsx", sheet_name="laucnty17", header=5, converters={1: str, 2: str})
+bls_df_18 = pd.read_excel("./datasources/laucnty18.xlsx", sheet_name="laucnty18", header=5, converters={1: str, 2: str})
+bls_df_19 = pd.read_excel("./datasources/laucnty19.xlsx", sheet_name="laucnty19", header=5, converters={1: str, 2: str})
+bls_df_20 = pd.read_excel("./datasources/laucnty20.xlsx", sheet_name="laucnty20", header=5, converters={1: str, 2: str})
+bls_df_18.head()
+
+
+# ## Exploratory Data Analysis
+# I will be exploring the MMG dataset first
+
+# In[429]:
+
+
+#Drop unneeded columns
+mmg_df_20_and_19.drop(mmg_df_20_and_19.columns[[1,2,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22]], axis=1, inplace=True)
+mmg_df_18.drop(mmg_df_18.columns[[1,2,5,6,7,8,9,10,11,12,13,14,15,17]], axis=1, inplace=True)
+mmg_df_17.drop(mmg_df_17.columns[[1,2,5,6,7,8,9,10,11,12,13,14,15,17]], axis=1, inplace=True)
+mmg_df_16.drop(mmg_df_16.columns[[1,2,5,6,7,8,9,10,11,12,13,14,15,17]], axis=1, inplace=True)
+mmg_df_15.drop(mmg_df_15.columns[[1,2,5,6,7,8,9,10,11,12,13,14,15,17]], axis=1, inplace=True)
+mmg_df_14.drop(mmg_df_14.columns[[1,2,5,6,7,8,9,10,11,12,13,14,15,17]], axis=1, inplace=True)
+mmg_df_13.drop(mmg_df_13.columns[[1,2,5,6,7,8,9,10,11,12,13,14,15,17]], axis=1, inplace=True)
+mmg_df_12.drop(mmg_df_12.columns[[1,2,5,6,7,8,9,10,11,12,13,14,15,17]], axis=1, inplace=True)
+mmg_df_11.drop(mmg_df_11.columns[[1,2,5,6,7,8,9,10,11,12,13,14,15,17]], axis=1, inplace=True)
+mmg_df_10.drop(mmg_df_10.columns[[1,2,5,6,7,8,9,10,11,12,13,14,15,17]], axis=1, inplace=True)
+mmg_df_10.head()
+
+
+# In[430]:
+
+
+#Rename columns
+mmg_df_20_and_19.columns = ['fips', 'year', 'fi_rate', 'fi_pop', 'cost_per_meal']
+
+#need to reorder mmg_df_20_and_19 since it is out of order
+mmg_df_20_and_19 = mmg_df_20_and_19[['fips', 'fi_rate', 'fi_pop', 'cost_per_meal', 'year']]
+
+mmg_df_18.columns = ['fips', 'fi_rate', 'fi_pop', 'cost_per_meal']
+mmg_df_17.columns = ['fips', 'fi_rate', 'fi_pop', 'cost_per_meal']
+mmg_df_16.columns = ['fips', 'fi_rate', 'fi_pop', 'cost_per_meal']
+mmg_df_15.columns = ['fips', 'fi_rate', 'fi_pop', 'cost_per_meal']
+mmg_df_14.columns = ['fips', 'fi_rate', 'fi_pop', 'cost_per_meal']
+mmg_df_13.columns = ['fips', 'fi_rate', 'fi_pop', 'cost_per_meal']
+mmg_df_12.columns = ['fips', 'fi_rate', 'fi_pop', 'cost_per_meal']
+mmg_df_11.columns = ['fips', 'fi_rate', 'fi_pop', 'cost_per_meal']
+mmg_df_10.columns = ['fips', 'fi_rate', 'fi_pop', 'cost_per_meal']
+mmg_df_20_and_19.head()
+
+
+# In[431]:
+
+
+#add the year column,
+mmg_df_18['year'] = 2018
+mmg_df_17['year'] = 2017
+mmg_df_16['year'] = 2016
+mmg_df_15['year'] = 2015
+mmg_df_14['year'] = 2014
+mmg_df_13['year'] = 2013
+mmg_df_12['year'] = 2012
+mmg_df_11['year'] = 2011
+mmg_df_10['year'] = 2010
+mmg_df_18.head()
+
+
+# In[457]:
+
+
+#Merge the frames together to form one dataset, convert column to string
+mmg_df = pd.concat([mmg_df_20_and_19, mmg_df_18, mmg_df_17, mmg_df_16, mmg_df_15, mmg_df_14, mmg_df_13, mmg_df_12, mmg_df_11, mmg_df_10])
+mmg_df['year'] = mmg_df['year'].astype(float)
+mmg_df['fips'] = mmg_df.fips.str.zfill(5)
+mmg_df.head(20)
+
+
+# In[433]:
+
+
+#Merge datasets since they have similar columns
+bls_df = pd.concat([bls_df_10, bls_df_11, bls_df_12, bls_df_13, bls_df_14, bls_df_15, bls_df_16, bls_df_17, bls_df_18, bls_df_19, bls_df_20])
+bls_df.sample(20)
+
+
+# In[434]:
+
+
+#Drop unneeded columns, merge fips codes, and rename, scale down value of 
+bls_df.drop(bls_df.columns[[0,3,5,6,7,8]], axis=1, inplace=True)
+bls_df.columns = ['state_fips', 'county_fips', 'year', 'unemp_rate']
+bls_df['fips'] = bls_df['state_fips'] + bls_df['county_fips']
+bls_df.drop(bls_df.columns[[0,1]], axis=1, inplace=True)
+bls_df['year'] = bls_df['year'].astype(float)
+bls_df = bls_df[bls_df.unemp_rate != 'N.A.']
+bls_df['unemp_rate'] = bls_df['unemp_rate'].astype(float)
+bls_df['unemp_rate'] = bls_df['unemp_rate'].div(100)
+bls_df.head()
+
+
+# In[435]:
+
+
+#master_df = pd.merge(, mmg_df, on={'year', 'fips'})
+master_df = mmg_df.merge(bls_df, how='outer', on=['fips', 'year'])
+master_df.sample(50)
+
+
+
+# 
+
+# In[ ]:
+
+
+fig = px.line(
+    data_frame=mmg_df.groupby(['year']).mean().reset_index(), 
+    x="year", 
+    y=['fi_rate']
+)
+
+fig.show()
+
+
+# In[438]:
+
+
+dfx = master_df.groupby(['year']).mean().reset_index().dropna()
+fig = px.line(
+    data_frame=dfx, 
+    x="year", 
+    y=[(dfx['unemp_rate'] - min(dfx['unemp_rate'])) / (max(dfx['unemp_rate']) - min(dfx['unemp_rate'])),
+    (dfx['fi_rate'] - min(dfx['fi_rate'])) / (max(dfx['fi_rate']) - min(dfx['fi_rate']))]
+)
+
+fig.show()
+
+
+# In[456]:
+
+
+#This example was provided by plotly.com
+mdf = mmg_df[mmg_df.year == 2010].dropna()
+fig = ff.create_choropleth(fips=mdf['fips'], values=mdf['fi_rate'])
+fig.layout.template = None
+fig.show()
+
+
+# In[ ]:
 
 
 get_ipython().system('jupyter nbconvert --to python source.ipynb')
