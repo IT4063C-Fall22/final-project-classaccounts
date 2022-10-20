@@ -44,7 +44,7 @@
 # 
 # The datasets I have identified can be used to get the information I need within my defined scope.
 
-# In[349]:
+# In[1]:
 
 
 #Imports needed for the notebook
@@ -66,7 +66,7 @@ import seaborn as sns
 # * Dataset URL: https://www.census.gov/programs-surveys/cbp/data/datasets.html
 # * Documentation URL: https://www2.census.gov/programs-surveys/cbp/technical-documentation/records-layouts/2020_record_layouts/county-layout-2020.txt
 
-# In[350]:
+# In[2]:
 
 
 #Not in use at this checkpoint
@@ -81,7 +81,7 @@ cbp = pd.read_csv("./datasources/cbp20co.txt")
 # * Dataset URL: *You must create an account to access this*
 # * Documentation URL: https://www.feedingamerica.org/research/map-the-meal-gap/overall-executive-summary
 
-# In[351]:
+# In[3]:
 
 
 mmg_df_20_and_19 = pd.read_excel("./datasources/MMG2022_2020-2019Data_ToShare.xlsx", sheet_name="County", header=1, converters={0: str})
@@ -104,7 +104,7 @@ mmg_df_10 = pd.read_excel("./datasources/MMG2012_2010Data_ToShare.xlsx", sheet_n
 # * Dataset URL: https://api.census.gov/data/timeseries/poverty/saipe?
 # * Documentation URL: https://api.census.gov/data/timeseries/poverty/saipe/variables.html
 
-# In[352]:
+# In[4]:
 
 
 def get_api_data(year):
@@ -133,7 +133,7 @@ pov_df_20 = get_api_data("2020")
 # * Dataset URL: https://www.bls.gov/lau/
 # * Documentation URL: https://www.bls.gov/lau/
 
-# In[353]:
+# In[5]:
 
 
 #datset #4
@@ -158,7 +158,7 @@ bls_df_20 = pd.read_excel("./datasources/laucnty20.xlsx", sheet_name="laucnty20"
 # 
 # First, we need to drop unneeded columns to reduce the dataframes (DF) size. Since the MMG DFs have different columns for each dataset, we will need to drop them individually. We would also need to rename them to something that is more human-readable. Once the column headers are the same, we will need to add the year to each dataframe since the year is identified in the dataset file name, and that information is not available on a row level. We need to add it to the rows because we would merge all the dataframes on FIPS and year. Next, we need to concatenate all the individual MMG DFs into one. Once that is complete, I change the year to a float value on the concatenated MMG DF for EDA calculation reasons. In addition, we need to add leading 0's to the FIPS code since they were not padded in the dataset and are required for joins with other datasets. Finally, we multiply the FI rate to make it a percentage. 
 
-# In[354]:
+# In[6]:
 
 
 #Drop unneeded columns
@@ -212,7 +212,7 @@ mmg_df.sample(5)
 # 
 # We can start by merging all the BLS dataframes since their datasets contain the same column headers and names. Next, we need to drop the unneeded columns to reduce dataset size and remove information we do not need to analyze. We also need to rename the columns into something more readable in the bls_df dataframe. The FIPS codes in this dataset are split into state and county segments. We need to merge those FIPS codes to have one FIPS code, which is required to join other datasets. Once that is complete, we can drop the state and county FIPS columns since we have a single FIPS code column. Next, we must cast the year and unemployment rate as a float for EDA calculations. However, first, we need to remove nonnumerical values from the unemployment rate before we cast it to a float, or else it will throw an exception.
 
-# In[355]:
+# In[7]:
 
 
 #Concatenate frames, drop uneeded columns, rename the columns
@@ -235,7 +235,7 @@ bls_df.head()
 # 
 # Since all the datasets have the same column headers, we can concatenate them into a new dataframe and drop the columns we will not need. We will also need to rename them into something more readable. Finally, the API call we made returned all values under the string data type. Therefore, we need to convert the rest of the values other than FIPS to float.
 
-# In[356]:
+# In[8]:
 
 
 #Concat dataframes and drop uneeded columns, and rename
@@ -254,7 +254,7 @@ pov_df['year'] = pov_df['year'].astype(float)
 # 
 # Now that we have concatenated all the dataframes, the next step is to merge them, joined on fips and year. This will allow us to view the unemployment rate, food insecurity rate, poverty rate, and other values on one row where FIPS and year are the same. The rows will be inner joined to remove any null values.
 
-# In[389]:
+# In[9]:
 
 
 #Merging the datasets
@@ -264,7 +264,7 @@ master_df = master_df.merge(pov_df, how='inner', on=['fips', 'year'])
 
 # Below is descriptive information about the master dataframe. There would be no outliers unless we wanted to find the average population of a county since there are large population centers in the datframe.
 
-# In[358]:
+# In[10]:
 
 
 master_df.describe() 
@@ -272,7 +272,7 @@ master_df.describe()
 
 # Since we inner joined the datasets, there are no null values, as seen below. Therefore, we will not have to remove or fill any null values.
 
-# In[387]:
+# In[11]:
 
 
 master_df.isnull().sum()
@@ -280,7 +280,7 @@ master_df.isnull().sum()
 
 # As validated below, there are also no duplicate rows based on the year and FIPS.
 
-# In[383]:
+# In[12]:
 
 
 master_df[master_df.duplicated(['fips', 'year']) == True]
@@ -288,7 +288,7 @@ master_df[master_df.duplicated(['fips', 'year']) == True]
 
 # Below is an example of what a typical County looks like. In our example, we will use Hamilton county Ohio.
 
-# In[388]:
+# In[13]:
 
 
 master_df[master_df['fips'] == "39061"]
@@ -300,23 +300,23 @@ master_df[master_df['fips'] == "39061"]
 # 
 # Below is a correlation matrix of all the values in the master dataframe. Some of the values are closely correlated, like the unemployment rate and food insecurity rate. 
 
-# In[404]:
+# In[24]:
 
 
-sns.heatmap(master_df.iloc[:,:10].corr(), center=0);
+sns.heatmap(master_df.corr(), center=0);
 
 
 # In addition, we can also see the variation of the data using a box plot below, and this can help us identify any major outliers.
 
-# In[405]:
+# In[35]:
 
 
-sns.boxplot(data=master_df.iloc[0:10])
+sns.boxplot(master_df.iloc[0:3])
 
 
 # The chart below takes our values with the highest correlation found in the correlation matrix and plots them over time based on the mean of each value. The values have been scaled to the same magnitude—credit to Erica Forehand for this formula. 
 
-# In[407]:
+# In[16]:
 
 
 dfx = master_df.groupby(['year']).mean().reset_index()
@@ -336,7 +336,7 @@ fig.show()
 # 
 # Also, the median income and cost per meal are strongly correlated and have an inverse correlation to the unemployment rate, poverty rate, and food insecurity rate.
 
-# In[408]:
+# In[17]:
 
 
 mdf = master_df[master_df.year == 2013]
@@ -347,7 +347,7 @@ fig.show()
 
 # Above, you can see a choropleth map for Food insecurity in 2013. This is a great way to visually represent the United States geography and show which areas are most impacted by food security. We can also create another choropleth map to compare food insecurity and unemployment by county in 2013 below.
 
-# In[411]:
+# In[18]:
 
 
 mdf = master_df[master_df.year == 2020]
@@ -374,7 +374,7 @@ fig.show()
 # 
 # 
 
-# In[ ]:
+# In[19]:
 
 
 get_ipython().system('jupyter nbconvert --to python source.ipynb')
