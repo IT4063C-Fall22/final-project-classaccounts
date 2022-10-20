@@ -46,4 +46,4 @@ The datasets I have identified can be used to get the information I need within 
 
 ## Installing Dependencies
 This assignment does not assume any particular setup. To install the dependencies, please run the command relevant to you're setup.
-- run `poetry install`.
+- run `pipenv install`.
