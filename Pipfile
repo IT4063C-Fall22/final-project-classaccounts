@@ -16,6 +16,8 @@ geopandas = "*"
 numpy = "*"
 shapely = "*"
 pyshp = "*"
+redivis = "*"
+cenpy = "*"
 
 [dev-packages]
 
