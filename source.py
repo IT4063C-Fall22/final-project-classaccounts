@@ -300,7 +300,7 @@ master_df[master_df['fips'] == "39061"]
 # 
 # Below is a correlation matrix of all the values in the master dataframe. Some of the values are closely correlated, like the unemployment rate and food insecurity rate. 
 
-# In[24]:
+# In[14]:
 
 
 sns.heatmap(master_df.corr(), center=0);
@@ -308,7 +308,7 @@ sns.heatmap(master_df.corr(), center=0);
 
 # In addition, we can also see the variation of the data using a box plot below, and this can help us identify any major outliers.
 
-# In[35]:
+# In[15]:
 
 
 sns.boxplot(master_df.iloc[0:3])
@@ -356,6 +356,49 @@ fig.layout.template = None
 fig.show()
 
 
+# In[29]:
+
+
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import make_pipeline
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+import numpy as np
+
+income_model = LinearRegression()
+income_model.fit(master_df[['unemp_rate', 'pov_rate']], master_df['fi_rate'])
+
+print(income_model.coef_, income_model.intercept_)
+
+x_surf, y_surf = np.meshgrid(
+  np.linspace(master_df.unemp_rate.min(), master_df.pov_rate.max(), 100),
+  np.linspace(master_df.unemp_rate.min(), master_df.pov_rate.max(), 100)
+)
+surfaceX = pd.DataFrame({'unemp_rate': x_surf.ravel(), 'pov_rate': y_surf.ravel()})
+predictedIncomeForSurface=income_model.predict(surfaceX)
+
+## convert the predicted result in an array
+predictedIncomeForSurface=np.array(predictedIncomeForSurface)
+# predictedIncomeForSurface
+
+# Visualize the Data for Multiple Linear Regression
+
+
+fig = plt.figure(figsize=(20,10))
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(master_df['unemp_rate'], master_df['pov_rate'], master_df['fi_rate'],c='red', marker='o', alpha=0.5)
+
+for degree in [1,2,3,4]:
+  model = make_pipeline(
+    PolynomialFeatures(degree),
+    LinearRegression()
+  )
+  model.fit(master_df[['unemp_rate', 'pov_rate']], master_df['fi_rate'])
+  predictedSurface = model.predict(surfaceX)
+plt.plot_surface(x_surf, y_surf, predictedSurface.reshape(x_surf.shape), alpha=0.3)
+
+
 # ## Machine Learning Plan
 # 
 # * What types of machine learning will you use in your project?
@@ -374,7 +417,7 @@ fig.show()
 # 
 # 
 
-# In[19]:
+# In[ ]:
 
 
 get_ipython().system('jupyter nbconvert --to python source.ipynb')

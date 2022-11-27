@@ -18,6 +18,9 @@ shapely = "*"
 pyshp = "*"
 redivis = "*"
 cenpy = "*"
+sklearn = "*"
+matplotlib = "*"
+xgboost = "*"
 
 [dev-packages]
 
