@@ -43,6 +43,9 @@ With my datasets I can do descriptive, predictive, exploratory, and inferential 
 
 The datasets I have identified can be used to get the information I need within my defined scope.
 
+## Results
+
+![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/2020_actual.png?raw=true)
 
 ## Installing Dependencies
 - run `pipenv install`.
