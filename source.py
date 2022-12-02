@@ -44,7 +44,7 @@
 # 
 # The datasets I have identified can be used to get the information I need within my defined scope.
 
-# In[35]:
+# In[238]:
 
 
 #Imports needed for the notebook
@@ -68,7 +68,10 @@ from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
-import xgboost as xg
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import KFold
+import pickle
 import numpy as np
 
 
@@ -80,7 +83,7 @@ import numpy as np
 # * Dataset URL: https://www.census.gov/programs-surveys/cbp/data/datasets.html
 # * Documentation URL: https://www2.census.gov/programs-surveys/cbp/technical-documentation/records-layouts/2020_record_layouts/county-layout-2020.txt
 
-# In[2]:
+# In[239]:
 
 
 #Not in use at this checkpoint
@@ -95,7 +98,7 @@ cbp = pd.read_csv("./datasources/cbp20co.txt")
 # * Dataset URL: *You must create an account to access this*
 # * Documentation URL: https://www.feedingamerica.org/research/map-the-meal-gap/overall-executive-summary
 
-# In[3]:
+# In[240]:
 
 
 mmg_df_20_and_19 = pd.read_excel("./datasources/MMG2022_2020-2019Data_ToShare.xlsx", sheet_name="County", header=1, converters={0: str})
@@ -118,7 +121,7 @@ mmg_df_10 = pd.read_excel("./datasources/MMG2012_2010Data_ToShare.xlsx", sheet_n
 # * Dataset URL: https://api.census.gov/data/timeseries/poverty/saipe?
 # * Documentation URL: https://api.census.gov/data/timeseries/poverty/saipe/variables.html
 
-# In[4]:
+# In[241]:
 
 
 def get_api_data(year):
@@ -147,7 +150,7 @@ pov_df_20 = get_api_data("2020")
 # * Dataset URL: https://www.bls.gov/lau/
 # * Documentation URL: https://www.bls.gov/lau/
 
-# In[5]:
+# In[242]:
 
 
 #datset #4
@@ -172,7 +175,7 @@ bls_df_20 = pd.read_excel("./datasources/laucnty20.xlsx", sheet_name="laucnty20"
 # 
 # First, we need to drop unneeded columns to reduce the dataframes (DF) size. Since the MMG DFs have different columns for each dataset, we will need to drop them individually. We would also need to rename them to something that is more human-readable. Once the column headers are the same, we will need to add the year to each dataframe since the year is identified in the dataset file name, and that information is not available on a row level. We need to add it to the rows because we would merge all the dataframes on FIPS and year. Next, we need to concatenate all the individual MMG DFs into one. Once that is complete, I change the year to a float value on the concatenated MMG DF for EDA calculation reasons. In addition, we need to add leading 0's to the FIPS code since they were not padded in the dataset and are required for joins with other datasets. Finally, we multiply the FI rate to make it a percentage. 
 
-# In[6]:
+# In[243]:
 
 
 #Drop unneeded columns
@@ -226,7 +229,7 @@ mmg_df.sample(5)
 # 
 # We can start by merging all the BLS dataframes since their datasets contain the same column headers and names. Next, we need to drop the unneeded columns to reduce dataset size and remove information we do not need to analyze. We also need to rename the columns into something more readable in the bls_df dataframe. The FIPS codes in this dataset are split into state and county segments. We need to merge those FIPS codes to have one FIPS code, which is required to join other datasets. Once that is complete, we can drop the state and county FIPS columns since we have a single FIPS code column. Next, we must cast the year and unemployment rate as a float for EDA calculations. However, first, we need to remove nonnumerical values from the unemployment rate before we cast it to a float, or else it will throw an exception.
 
-# In[7]:
+# In[244]:
 
 
 #Concatenate frames, drop uneeded columns, rename the columns
@@ -249,7 +252,7 @@ bls_df.head()
 # 
 # Since all the datasets have the same column headers, we can concatenate them into a new dataframe and drop the columns we will not need. We will also need to rename them into something more readable. Finally, the API call we made returned all values under the string data type. Therefore, we need to convert the rest of the values other than FIPS to float.
 
-# In[8]:
+# In[245]:
 
 
 #Concat dataframes and drop uneeded columns, and rename
@@ -268,7 +271,7 @@ pov_df['year'] = pov_df['year'].astype(float)
 # 
 # Now that we have concatenated all the dataframes, the next step is to merge them, joined on fips and year. This will allow us to view the unemployment rate, food insecurity rate, poverty rate, and other values on one row where FIPS and year are the same. The rows will be inner joined to remove any null values.
 
-# In[9]:
+# In[246]:
 
 
 #Merging the datasets
@@ -278,7 +281,7 @@ master_df = master_df.merge(pov_df, how='inner', on=['fips', 'year'])
 
 # Below is descriptive information about the master dataframe. There would be no outliers unless we wanted to find the average population of a county since there are large population centers in the datframe.
 
-# In[10]:
+# In[247]:
 
 
 master_df.describe() 
@@ -286,7 +289,7 @@ master_df.describe()
 
 # Since we inner joined the datasets, there are no null values, as seen below. Therefore, we will not have to remove or fill any null values.
 
-# In[11]:
+# In[248]:
 
 
 master_df.isnull().sum()
@@ -294,7 +297,7 @@ master_df.isnull().sum()
 
 # As validated below, there are also no duplicate rows based on the year and FIPS.
 
-# In[12]:
+# In[249]:
 
 
 master_df[master_df.duplicated(['fips', 'year']) == True]
@@ -302,7 +305,7 @@ master_df[master_df.duplicated(['fips', 'year']) == True]
 
 # Below is an example of what a typical County looks like. In our example, we will use Hamilton county Ohio.
 
-# In[13]:
+# In[250]:
 
 
 master_df[master_df['fips'] == "39061"]
@@ -314,7 +317,7 @@ master_df[master_df['fips'] == "39061"]
 # 
 # Below is a correlation matrix of all the values in the master dataframe. Some of the values are closely correlated, like the unemployment rate and food insecurity rate. 
 
-# In[14]:
+# In[251]:
 
 
 sns.heatmap(master_df.corr(), center=0);
@@ -322,7 +325,7 @@ sns.heatmap(master_df.corr(), center=0);
 
 # In addition, we can also see the variation of the data using a box plot below, and this can help us identify any major outliers.
 
-# In[15]:
+# In[252]:
 
 
 sns.boxplot(master_df.iloc[0:3])
@@ -330,7 +333,7 @@ sns.boxplot(master_df.iloc[0:3])
 
 # The chart below takes our values with the highest correlation found in the correlation matrix and plots them over time based on the mean of each value. The values have been scaled to the same magnitude—credit to Erica Forehand for this formula. 
 
-# In[16]:
+# In[253]:
 
 
 dfx = master_df.groupby(['year']).mean().reset_index()
@@ -350,23 +353,62 @@ fig.show()
 # 
 # Also, the median income and cost per meal are strongly correlated and have an inverse correlation to the unemployment rate, poverty rate, and food insecurity rate.
 
-# In[17]:
+# In[254]:
 
 
-mdf = master_df[master_df.year == 2013]
-fig = ff.create_choropleth(fips=mdf['fips'], values=mdf['fi_rate'])
-fig.layout.template = None
+mdf = master_df[master_df.year == 2020]
+with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
+    counties = json.load(response)
+df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/fips-unemp-16.csv",
+                   dtype={"fips": str})
+fig = px.choropleth(mdf, geojson=counties, locations='fips', color='fi_rate',
+                           color_continuous_scale="Jet",
+                           range_color=(0, mdf.fi_rate.max()),
+                           scope="usa",
+                           labels={'fi_rate':'2020 Food Insecurity Rate %'}
+                          )
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+fig.show()
+
+
+# In[255]:
+
+
+fig = px.choropleth(master_df[master_df.year == 2010], geojson=counties, locations='fips', color='fi_rate',
+                           color_continuous_scale="Jet",
+                           range_color=(0, mdf.fi_rate.max()),
+                           scope="usa",
+                           labels={'fi_rate':'2010 Food Insecurity Rate %'}
+                          )
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 fig.show()
 
 
 # Above, you can see a choropleth map for Food insecurity in 2013. This is a great way to visually represent the United States geography and show which areas are most impacted by food security. We can also create another choropleth map to compare food insecurity and unemployment by county in 2013 below.
 
-# In[18]:
+# In[256]:
 
 
-mdf = master_df[master_df.year == 2020]
-fig = ff.create_choropleth(fips=mdf['fips'], values=mdf['unemp_rate'])
-fig.layout.template = None
+fig = px.choropleth(mdf, geojson=counties, locations='fips', color='unemp_rate',
+                           color_continuous_scale="Jet",
+                           range_color=(0, mdf.unemp_rate.max()),
+                           scope="usa",
+                           labels={'unemp_rate':'unemployment rate'}
+                          )
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+fig.show()
+
+
+# In[257]:
+
+
+fig = px.choropleth(mdf, geojson=counties, locations='fips', color='pov_rate',
+                           color_continuous_scale="Jet",
+                           range_color=(0, mdf.pov_rate.max()),
+                           scope="usa",
+                           labels={'unemp_rate':'unemployment rate'}
+                          )
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 fig.show()
 
 
@@ -383,33 +425,50 @@ fig.show()
 # * What challenges will you potentially face?
 # 
 # I have not previously used ML models in python for regression, so there could be a sharp learning curve.
-# 
-# (Sorry, I ran out of steam writing this problem, I'm sure I will have a much better answer once I have some ML implementation experience through labs. However, I'm confident I can create a model if it's anything like TensorFlow)
-# 
-# 
 
-# ## Machine Learning Checkpoint 3, in progress
+# ## Machine Learning & Predictive Model
+# In this section I will build a predictive regression model to estimate the food insecurity rate of a given county
 
-# In[89]:
+# Let's start by creating a copy of my merged dataframe below.
+
+# In[258]:
 
 
 fi_model = master_df.copy()
 
 
-# In[90]:
+# The fi_model needs to be split into testing and training. I will not be using a stattified split since an equal split on some variable is not needed.
+# 
+# I will also drop the features of the fi_model (fi_X) that I do not need and create the target series (fi_rate, fi_y)
+
+# In[259]:
 
 
 fi_train_set, fi_test_set = train_test_split(fi_model, random_state=42, test_size=0.2)
-fi_X = fi_train_set.drop(['fi_rate', 'county_name', 'fips', 'year', 'cost_per_meal', 'fi_pop'], axis=1)
+fi_X = fi_train_set.drop(['fi_rate', 'county_name', 'fips', 'fi_pop', 'cost_per_meal', 'year'], axis=1)
 fi_y = fi_train_set['fi_rate'].copy()
 
 
-# In[91]:
+# The model pipeline below contains the steps to fit and transform my fi_model. First, we will use a custom transformer to get some engineered features like the total population which is derived from tot_pop_pov and pov_rate. Next, we use as simple imputer and standard scaler to further improve the output of our prepared model. The standard scaler was very important for this project due to the range of data.
+
+# In[260]:
 
 
 num_features = fi_X.columns
 
+class FeatureEngineer(BaseEstimator, TransformerMixin):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        X['tot_pop'] = X['tot_pop_pov'] / (X['pov_rate'] * 0.01)
+        return X
+
 num_pipeline = Pipeline([
+    ('fe', FeatureEngineer()),
     ('imputer', SimpleImputer(strategy='mean')),
     ('scaler', StandardScaler())
 ])
@@ -421,79 +480,189 @@ full_pipeline = ColumnTransformer([
 fi_X_prepared = full_pipeline.fit_transform(fi_X)
 
 
-# In[92]:
+# I tested multiple regressors and got the lowest RMSE score and best CV by using the Random Forest Regressor. In addition, I've attempted to tune it with some hyper parameters. This is the best model for predicting our target of food insecurity rate.
+
+# In[261]:
 
 
-import xgboost as xg
-from sklearn.ensemble import RandomForestRegressor
-poly_reg = Pipeline([
-    #('poly', PolynomialFeatures(2)),
-    ('lin', RandomForestRegressor())
+rfr = Pipeline([
+    ('lin', RandomForestRegressor(random_state=42, n_estimators=250))
 ])
-poly_reg.fit(fi_X_prepared, fi_y)
+rfr.fit(fi_X_prepared, fi_y)
 
 
-# In[82]:
+# Finding the training set RMSE below.
+
+# In[262]:
 
 
-from sklearn.model_selection import cross_val_score
-predictions = poly_reg.predict(fi_X_prepared)
-poly_mse = mean_squared_error(fi_y, predictions)
-poly_rmse = np.sqrt(poly_mse)
-poly_rmse
+predictions = rfr.predict(fi_X_prepared)
+rfr_mse = mean_squared_error(fi_y, predictions)
+rfr_rmse = np.sqrt(rfr_mse)
+print('The Train Random Forest Regressor RMSE:', rfr_rmse)
 
 
-# In[78]:
+# Finding the predictive model Cross Validation score below.
+
+# In[263]:
 
 
-from sklearn.model_selection import (
-  StratifiedShuffleSplit,
-  train_test_split,
-  cross_val_score,
-  KFold,
-  GridSearchCV
-)
-kfold = KFold(n_splits=10, random_state=42, shuffle=True)
-scores = cross_val_score(poly_reg, fi_X, fi_y, cv=kfold,  scoring='r2')
-print('Mean CV Score:', abs(np.mean(scores)))
+kfold = KFold(n_splits=10)
+scores = cross_val_score(rfr, fi_X, fi_y, cv=kfold,  scoring='r2')
+print('The Mean Random Forest Regressor CV Score:', abs(np.mean(scores)))
 
 
-# In[93]:
+# Testing set RMSE below.
+
+# In[264]:
 
 
-'''
+fi_test_X = fi_test_set.drop(['fi_rate', 'county_name', 'fips', 'year', 'cost_per_meal'], axis=1)
+fi_test_y = fi_test_set['fi_rate'].copy()
+X_test_clean = full_pipeline.transform(fi_test_X)
+predictions_poly = rfr.predict(X_test_clean)
+rfr_mse = mean_squared_error(fi_test_y, predictions_poly)
+test_rfr_rmse = np.sqrt(rfr_mse)
+print('The Test Random Forest Regressor RMSE:', test_rfr_rmse)
+
+
+# While the results for my model may not look great at first glance, the mean margin of error is typically off by only 0.8%, which is not bad. We can check this by comparing the actual food insecurity rate vs the predicted food insecurity rate. I will also demonstrate this in the Results section of this notebook.
+# 
+# In addition, I also compared the actuals of 2020 to the predictions of a similiar trained model where I remove data from the year 2020. The best model contains training data from 2010 - 2020 where the no2020 contains training data from 201-2019. I did this to test how well the regression model is working when the data we are trying to predict was not included in the training.
+
+# In[265]:
+
+
+fi_model_no2020  = master_df[master_df['year'] != 2020]
+fi_train_set_no2020 , fi_test_set_no2020  = train_test_split(fi_model_no2020 , random_state=42, test_size=0.2)
+fi_X_no2020  = fi_train_set_no2020 .drop(['fi_rate', 'county_name', 'fips', 'fi_pop', 'cost_per_meal', 'year'], axis=1)
+fi_y_no2020  = fi_train_set_no2020 ['fi_rate'].copy()
+num_features_no2020  = fi_X_no2020 .columns
+class FeatureEngineer_no2020(BaseEstimator, TransformerMixin):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        X['tot_pop'] = X['tot_pop_pov'] / (X['pov_rate'] * 0.01)
+        return X
+num_pipeline_no2020  = Pipeline([
+    ('fe', FeatureEngineer_no2020()),
+    ('imputer', SimpleImputer(strategy='mean')),
+    ('scaler', StandardScaler())
+])
+full_pipeline_no2020  = ColumnTransformer([
+    ('num', num_pipeline_no2020, num_features_no2020)
+])
+fi_X_prepared_no2020  = full_pipeline_no2020.fit_transform(fi_X_no2020)
+rfr_no2020  = Pipeline([
+    ('lin', RandomForestRegressor(random_state=42, n_estimators=250))
+])
+rfr_no2020.fit(fi_X_prepared_no2020, fi_y_no2020)
+
+
+# The code below creates a table of the actual food insecurity rates for 2020 vs. the predicted food insecurity of 2020 using my best model vs. the predicted food insecurity rate of 2020 using a clone of my best model that was not trained on 2020 data.
+
+# In[266]:
+
+
+fi_2020 = master_df[master_df['year'] == 2020]
+fi_2020_X = fi_2020.drop(['fi_rate', 'county_name', 'fips', 'fi_pop', 'cost_per_meal', 'year'], axis=1)
+fi_2020_y = pd.DataFrame(fi_2020['fi_rate'].copy())
+rfr_no2020.predict(full_pipeline_no2020.transform(fi_2020_X))
+comp_df = pd.DataFrame({
+    'fips': fi_2020['fips'].values,
+    'fi_rate':fi_2020_y['fi_rate'].values,
+    'pred_fi':rfr.predict(full_pipeline.transform(fi_2020_X)),
+    'pred_fi_no2020':rfr_no2020.predict(full_pipeline_no2020.transform(fi_2020_X))
+})
+comp_df['pred_fi'] = comp_df['pred_fi'].round(1)
+comp_df['pred_fi_no2020'] = comp_df['pred_fi_no2020'].round(1)
+comp_df['margin_of_error_best_model'] = abs(comp_df['fi_rate'] - comp_df['pred_fi'])
+comp_df['margin_of_error_best_model_no2020'] = abs(comp_df['fi_rate'] - comp_df['pred_fi_no2020'])
+display(comp_df.sample(10))
+print('The mean error for the best model is', round(comp_df.margin_of_error_best_model.mean(),1), 'for the dataset')
+print('The mean error for the best model without 2020 training data is', round(comp_df.margin_of_error_best_model_no2020.mean(),1), 'for the dataset')
+
+
+# ## Results
+# 
+# The best way to demonstrate the result of my final project is to create a choropleth map comparing the actual food insecurity rate to my Random Forest regression model. The first map shows the actual food insecurity rate for 2020 and the second map shows the predicted food insecurity rate for 2020 using my model.
+
+# ### 2020 Actual Food Insecurity Map
+
+# In[267]:
+
+
+fig = px.choropleth(comp_df, geojson=counties, locations='fips', color='fi_rate',
+                           color_continuous_scale="Jet",
+                           range_color=(min(comp_df[['pred_fi', 'fi_rate', 'pred_fi_no2020']].min(axis=0)), max(comp_df[['pred_fi', 'fi_rate', 'pred_fi_no2020']].max(axis=0))),
+                           scope="usa",
+                           labels={'fi_rate':'2020 Food Insecurity Actuals'}
+                          )
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+fig.show()
+
+
+# ### 2020 Machine Learning Model Predicted Food Insecurity Map
+
+# In[268]:
+
+
+fig = px.choropleth(comp_df, geojson=counties, locations='fips', color='pred_fi',
+                           color_continuous_scale="Jet",
+                           range_color=(min(comp_df[['pred_fi', 'fi_rate', 'pred_fi_no2020']].min(axis=0)), max(comp_df[['pred_fi', 'fi_rate', 'pred_fi_no2020']].max(axis=0))),
+                           scope="usa",
+                           labels={'pred_fi':'2020 Food Insecurity Predictions'}
+                          )
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+fig.show()
+
+
+# ### 2020 Machine Learning Model Predicting Food Insecurity Map Without 2020 Training Data
+# 
+# Since the previous chart was predicting 2020 actuals based on trained data from 2010 - 2020, I also wanted to create another trained model (2010 - 2019) that was not fitted with 2020 data and see how it performs predicting 2020 food insecurity, you can see the results below.
+
+# In[269]:
+
+
+fig = px.choropleth(comp_df, geojson=counties, locations='fips', color='pred_fi_no2020',
+                           color_continuous_scale="Jet",
+                           range_color=(min(comp_df[['pred_fi', 'fi_rate', 'pred_fi_no2020']].min(axis=0)), max(comp_df[['pred_fi', 'fi_rate', 'pred_fi_no2020']].max(axis=0))),
+                           scope="usa",
+                           labels={'pred_fi_no2020':'2020 Food Insecurity Predictions Without 2020 Training'}
+                          )
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+fig.show()
+
+
+# Below is an example of how you can predict a county's food insecurity at an ad hoc level. However, there is not enough poverty or unemployment data since 2020 to make these type of predictions
+
+# In[270]:
+
+
 pred = pd.DataFrame({
-    'pov_rate': [12.7],
-    'tot_pop_pov': [101099],
-    'med_income': [63919],
-    'unemp_rate': [7.9],
-    'cost_per_meal': [3.33],
-    'fi_pop': [101790]
+    'pov_rate': [16.9],
+    'tot_pop_pov': [7426.0],
+    'med_income': [51751.0],
+    'unemp_rate': [5.1],
 })
 pred_trans = full_pipeline.transform(pred)
-print(poly_reg.predict(pred_trans))
-'''
+print(rfr.predict(pred_trans))
 
 
-# In[94]:
+# Saving the best model and all features using pickle.
+
+# In[271]:
 
 
-#Maybe use strat split to include all counties
-fi_test_X = fi_train_set.drop(['fi_rate', 'county_name', 'fips', 'year', 'cost_per_meal'], axis=1)
-fi_test_y = fi_train_set['fi_rate'].copy()
-
-X_test_clean = full_pipeline.transform(fi_test_X)
-predictions_poly = poly_reg.predict(X_test_clean)
-test_poly_mse = mean_squared_error(fi_test_y, predictions_poly)
-test_poly_rmse = np.sqrt(test_poly_mse)
-test_poly_rmse
+pickle.dump(master_df, file=open('all_features.pkl', 'wb'))
+#pickle.dump(rfr, file=open('predictive_model.pkl', 'wb'))
 
 
-# ### The RMSE for Training is 0.44
-# ### The RMSE for Testing is 0.43
-# ### The CV Score is 0.92
-
-# In[19]:
+# In[272]:
 
 
 get_ipython().system('jupyter nbconvert --to python source.ipynb')
