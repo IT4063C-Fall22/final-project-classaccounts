@@ -1,5 +1,5 @@
 
-## Finding Food Insecurity
+# Finding Food Insecurity
 
 ## Topic
 
@@ -29,24 +29,16 @@ I would be able to use the MMG dataset to identify the FII of each county. I can
 
 Please see more information regarding the datasets on the Jupyter notebook.
 
-## Prior Feeback
-
-* *Is there enough data points that you'd be able to narrow the scope by that much?*
-
-I have modified my scope to the county level inside the United States, and I can narrow it to this level using FIPS codes.
-
-* *it seems that the project's scope is limited to descriptive analysis; I recommend digging a bit deeper and exploring other analysis types that might be helpful for this project.*
-
-With my datasets I can do descriptive, predictive, exploratory, and inferential analysis. However, I really want to do predictive analyisis to find which countys may experience high FI in the future, but currently do not have the data analysis skills to do so.
-
-* *you mentioned that you'd like to use "conformed dimensions from different datasets related to food insecurity". Are you able to identify some of those? if not the dataset itself, then a scope of what kind of information would like to get.*
-
-The datasets I have identified can be used to get the information I need within my defined scope.
-
 ## Results
 
+I was able to successfully create a Machine Learning model that can predict food insecurity rates for a given county in the United States. I will demonstrate this with the following choropleth maps. To see how I reached these results, please run my notebook and walk through each step from data preparation/cleaning, EDA, to ML modeling.
+
+### 2020 Actual Food Insecurity Map
 ![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/2020_actual.png?raw=true)
+### 2020 Machine Learning Model Predicted Food Insecurity Map
 ![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/2020_prediction.png?raw=true)
+### 2020 Machine Learning Model Predicting Food Insecurity Map Without 2020 Training Data
+Since the previous map was predicting 2020 actuals based on trained data from 2010 - 2020, I also wanted to create another trained model (2010 - 2019) that was not fitted with 2020 data and see how it performs predicting 2020 food insecurity, you can see the results below.
 ![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/2020_prediction_no2020train.png?raw=true)
 
 ## Installing Dependencies
