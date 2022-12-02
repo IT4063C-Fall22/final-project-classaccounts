@@ -44,7 +44,7 @@
 # 
 # The datasets I have identified can be used to get the information I need within my defined scope.
 
-# In[1]:
+# In[35]:
 
 
 #Imports needed for the notebook
@@ -56,6 +56,20 @@ import plotly as plt
 from urllib.request import urlopen
 import json
 import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import make_pipeline
+import xgboost as xg
+import numpy as np
 
 
 # ### Dataset #1 - County Business Patterns
@@ -356,49 +370,6 @@ fig.layout.template = None
 fig.show()
 
 
-# In[29]:
-
-
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.linear_model import LinearRegression
-from sklearn.pipeline import make_pipeline
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-import numpy as np
-
-income_model = LinearRegression()
-income_model.fit(master_df[['unemp_rate', 'pov_rate']], master_df['fi_rate'])
-
-print(income_model.coef_, income_model.intercept_)
-
-x_surf, y_surf = np.meshgrid(
-  np.linspace(master_df.unemp_rate.min(), master_df.pov_rate.max(), 100),
-  np.linspace(master_df.unemp_rate.min(), master_df.pov_rate.max(), 100)
-)
-surfaceX = pd.DataFrame({'unemp_rate': x_surf.ravel(), 'pov_rate': y_surf.ravel()})
-predictedIncomeForSurface=income_model.predict(surfaceX)
-
-## convert the predicted result in an array
-predictedIncomeForSurface=np.array(predictedIncomeForSurface)
-# predictedIncomeForSurface
-
-# Visualize the Data for Multiple Linear Regression
-
-
-fig = plt.figure(figsize=(20,10))
-ax = fig.add_subplot(111, projection='3d')
-ax.scatter(master_df['unemp_rate'], master_df['pov_rate'], master_df['fi_rate'],c='red', marker='o', alpha=0.5)
-
-for degree in [1,2,3,4]:
-  model = make_pipeline(
-    PolynomialFeatures(degree),
-    LinearRegression()
-  )
-  model.fit(master_df[['unemp_rate', 'pov_rate']], master_df['fi_rate'])
-  predictedSurface = model.predict(surfaceX)
-plt.plot_surface(x_surf, y_surf, predictedSurface.reshape(x_surf.shape), alpha=0.3)
-
-
 # ## Machine Learning Plan
 # 
 # * What types of machine learning will you use in your project?
@@ -417,7 +388,112 @@ plt.plot_surface(x_surf, y_surf, predictedSurface.reshape(x_surf.shape), alpha=0
 # 
 # 
 
-# In[ ]:
+# ## Machine Learning Checkpoint 3, in progress
+
+# In[89]:
+
+
+fi_model = master_df.copy()
+
+
+# In[90]:
+
+
+fi_train_set, fi_test_set = train_test_split(fi_model, random_state=42, test_size=0.2)
+fi_X = fi_train_set.drop(['fi_rate', 'county_name', 'fips', 'year', 'cost_per_meal', 'fi_pop'], axis=1)
+fi_y = fi_train_set['fi_rate'].copy()
+
+
+# In[91]:
+
+
+num_features = fi_X.columns
+
+num_pipeline = Pipeline([
+    ('imputer', SimpleImputer(strategy='mean')),
+    ('scaler', StandardScaler())
+])
+
+full_pipeline = ColumnTransformer([
+    ('num', num_pipeline, num_features)
+])
+
+fi_X_prepared = full_pipeline.fit_transform(fi_X)
+
+
+# In[92]:
+
+
+import xgboost as xg
+from sklearn.ensemble import RandomForestRegressor
+poly_reg = Pipeline([
+    #('poly', PolynomialFeatures(2)),
+    ('lin', RandomForestRegressor())
+])
+poly_reg.fit(fi_X_prepared, fi_y)
+
+
+# In[82]:
+
+
+from sklearn.model_selection import cross_val_score
+predictions = poly_reg.predict(fi_X_prepared)
+poly_mse = mean_squared_error(fi_y, predictions)
+poly_rmse = np.sqrt(poly_mse)
+poly_rmse
+
+
+# In[78]:
+
+
+from sklearn.model_selection import (
+  StratifiedShuffleSplit,
+  train_test_split,
+  cross_val_score,
+  KFold,
+  GridSearchCV
+)
+kfold = KFold(n_splits=10, random_state=42, shuffle=True)
+scores = cross_val_score(poly_reg, fi_X, fi_y, cv=kfold,  scoring='r2')
+print('Mean CV Score:', abs(np.mean(scores)))
+
+
+# In[93]:
+
+
+'''
+pred = pd.DataFrame({
+    'pov_rate': [12.7],
+    'tot_pop_pov': [101099],
+    'med_income': [63919],
+    'unemp_rate': [7.9],
+    'cost_per_meal': [3.33],
+    'fi_pop': [101790]
+})
+pred_trans = full_pipeline.transform(pred)
+print(poly_reg.predict(pred_trans))
+'''
+
+
+# In[94]:
+
+
+#Maybe use strat split to include all counties
+fi_test_X = fi_train_set.drop(['fi_rate', 'county_name', 'fips', 'year', 'cost_per_meal'], axis=1)
+fi_test_y = fi_train_set['fi_rate'].copy()
+
+X_test_clean = full_pipeline.transform(fi_test_X)
+predictions_poly = poly_reg.predict(X_test_clean)
+test_poly_mse = mean_squared_error(fi_test_y, predictions_poly)
+test_poly_rmse = np.sqrt(test_poly_mse)
+test_poly_rmse
+
+
+# ### The RMSE for Training is 0.44
+# ### The RMSE for Testing is 0.43
+# ### The CV Score is 0.92
+
+# In[19]:
 
 
 get_ipython().system('jupyter nbconvert --to python source.ipynb')
