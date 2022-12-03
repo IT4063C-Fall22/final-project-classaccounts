@@ -33,6 +33,8 @@ Please see more information regarding the datasets on the Jupyter notebook.
 
 I was able to successfully create a Machine Learning model that can predict food insecurity rates for a given county in the United States. I will demonstrate this with the following choropleth maps. To see how I reached these results, please run my notebook and walk through each step from data preparation/cleaning, EDA, to ML modeling.
 
+Please be sure to check out the interactive maps on the notebook, so you can view specific county food insecurity rates.
+
 ### 2020 Actual Food Insecurity Map
 ![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/2020_actual.png?raw=true)
 ### 2020 Machine Learning Model Predicted Food Insecurity Map
