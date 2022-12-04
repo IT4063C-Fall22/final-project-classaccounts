@@ -21,7 +21,7 @@ I am trying to address food insecurity in the United States and identify geograp
 
 ## What would an answer look like?
 
-The essential deliverable would be a choropleth map (code example included) showing each country's food insecurity index (FII) rate in the United States. I would also have supporting line charts showing the FII rates compared to other indicators like poverty and unemployment. The great thing about relating my dataset using Federal Information Processing Standards (FIPS) is that I can incorporate more datasets to correlate them to the FII of each county. Therefore, I believe I could have multiple answers to my question depending on what indicator correlated to FII we want to look at through exploratory data analysis. This would allow me to create very concrete answers to my questions. Eventually, I would like to predict food insecurity based on these indicators. I can undoubtedly relate those indicators and likely correlate them to my FII per county.
+The essential deliverable would be a choropleth map showing each country's food insecurity index (FII) rate in the United States. I will also have supporting line charts showing the FII rates compared to other indicators like poverty and unemployment. The great thing about relating my dataset using Federal Information Processing Standards (FIPS) is that I can incorporate more datasets to correlate them to the FII of each county. Therefore, I believe I could have multiple answers to my question depending on what indicator correlated to FII we want to look at through exploratory data analysis. This would allow me to create very concrete answers to my questions. Eventually, I will predict food insecurity based on these indicators. 
 
 ## Data Sources
 
@@ -54,7 +54,7 @@ I successfully created a Machine Learning model that can predict food insecurity
 
 The interactive graphs in the results section of my notebook answer the following project questions:
 
-* *Which counties of the united states are most impacted by food insecurity, and what indicators like poverty, unemployment, and income are correlated to it?*
+* *Which counties of the United States are most impacted by food insecurity, and what indicators like poverty, unemployment, and income are correlated to it?*
 * *How can we predict food insecurity in the future?*
 
 Please check out the interactive maps on the notebook so you can view specific county food insecurity rates.

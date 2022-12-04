@@ -17,14 +17,18 @@
 # 
 # I am trying to address food insecurity in the United States and identify geographic areas where food programs like the Supplemental Nutrition Assistance Program (SNAP), Special Supplemental Nutrition Program for Women (WIC),  National School Lunch Program (NSLP), and Emergency Food Assistance Program (TEFAP) could be targeted. Those organizations allocate funding based on geographic areas with the greatest need. Therefore, it is essential to address this issue to ensure the right communities get the proper support through these programs to alleviate many health disparities caused by poor nutrition and food insecurity (FI).
 # 
+# *Oxford defines food insecurity as: "The state of being without reliable access to a sufficient quantity of affordable, nutritious food."*
+# 
+# *The USDA defines food insecurity as: "A lack of consistent access to enough food for every person in a household to live an active, healthy life."*
+# 
 # ## Project Question
 # 
-# * Which counties of the united states are most impacted by food insecurity, and what indicators like business patterns, houselessness, and income are correlated to it?
+# * Which counties of the United States are most impacted by food insecurity, and what indicators like poverty, unemployment, and income are correlated to it?
 # * How can we predict food insecurity in the future?
 # 
 # ## What would an answer look like?
 # 
-# The essential deliverable would be a choropleth map (code example included) showing each country's food insecurity index (FII) rate in the United States. I would also have supporting line charts showing the FII rates compared to other indicators like poverty and unemployment. The great thing about relating my dataset using Federal Information Processing Standards (FIPS) is that I can incorporate more datasets to correlate them to the FII of each county. Therefore, I believe I could have multiple answers to my question depending on what indicator correlated to FII we want to look at through exploratory data analysis. This would allow me to create very concrete answers to my questions. Eventually, I would like to predict food insecurity based on these indicators. I can undoubtedly relate those indicators and likely correlate them to my FII per county.
+# The essential deliverable would be a choropleth map showing each country's food insecurity index (FII) rate in the United States. I will also have supporting line charts showing the FII rates compared to other indicators like poverty and unemployment. The great thing about relating my dataset using Federal Information Processing Standards (FIPS) is that I can incorporate more datasets to correlate them to the FII of each county. Therefore, I believe I could have multiple answers to my question depending on what indicator correlated to FII we want to look at through exploratory data analysis. This would allow me to create very concrete answers to my questions. Eventually, I would like to predict food insecurity based on these indicators.
 # 
 # ## Data Sources
 # 
@@ -664,7 +668,7 @@ print(rfr.predict(pred_trans))
 #pickle.dump(rfr, file=open('predictive_model.pkl', 'wb'))
 
 
-# In[243]:
+# In[245]:
 
 
 get_ipython().system('jupyter nbconvert --to python source.ipynb')
