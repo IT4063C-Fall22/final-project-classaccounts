@@ -33,7 +33,7 @@ I will explore their relations in the EDA section of this notebook. However, I w
 
 Please see more information regarding the datasets in the Jupyter notebook.
 
-## Results
+## Results TALK ABOUT PANDEMIC DATA (REMOVE)
 
 I was able to successfully create a Machine Learning model that can predict food insecurity rates for a given county in the United States and answer my project questions. I will demonstrate this with the following choropleth maps. To see how I reached these results, please run my notebook and walk through each step from data preparation/cleaning, EDA, to ML modeling.
 
@@ -51,6 +51,6 @@ Please be sure to check out the interactive maps on the notebook, so you can vie
 
 ![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/2020_prediction.png?raw=true)
 ### 2020 Machine Learning Model Predicting Food Insecurity Map Without 2020 Training Data
-Since the previous map was predicting 2020 actuals based on trained data from 2010 - 2020, I also wanted to create another trained model (2010 - 2019) that was not fitted with 2020 data and see how it performs predicting 2020 food insecurity, you can see the results below. However, it does tend to overestimate counties with low food insecurity and predicts them to be higher than their actual (dark blue). I believe this is due to the unemployment spike from the COVID pandemic (2020) where food insecurity followed the mean yearly trend while unemployment rose and in which training data relating to that was purposely removed from this model. The regression model above would do a better job of predicting food insecurity with the COVID unemployment spike.
+Since the previous map was predicting 2020 actuals based on trained data from 2010 - 2020, I also wanted to create another trained model (2010 - 2019) that was not fitted with 2020 data and see how it performs predicting 2020 food insecurity, you can see the results below. However, it does tend to overestimate counties with low food insecurity and predicts them to be higher than their actual (dark blue). I believe this is due to the unemployment spike from the COVID pandemic (2020) where food insecurity followed the mean yearly trend while unemployment rose and in which training data relating to that was purposely removed from this model. The regression model above would do a better job of predicting food insecurity with the COVID unemployment spike. It is very difficult to create a model that predicts food insecurity given the COVID pandemic, emergency governmental support programs, and how it adjusted poverty and unemployment trends related to food inescurity.
 
 ![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/2020_prediction_no2020train.png?raw=true)
