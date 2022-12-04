@@ -14,7 +14,7 @@ I am trying to address food insecurity in the United States and identify geograp
 
 *The USDA defines food insecurity as: "A lack of consistent access to enough food for every person in a household to live an active, healthy life."*
 
-## Project Question
+## Project Questions
 
 * Which counties of the United States are most impacted by food insecurity, and what indicators like unemployment, poverty, and income are correlated to it?
 * How can we predict food insecurity in the future?
