@@ -37,7 +37,7 @@
 # 
 # These datasets can be related using the FIPS code, which can indicate the county each row pertains to. All of these datasets I have imported contain a FIPS code. Therefore, I can join each of them using the county segment of the FIPS code.
 
-# In[167]:
+# In[204]:
 
 
 #Imports needed for the notebook
@@ -72,7 +72,7 @@ np.random.seed(42)
 # * Dataset URL: https://www.census.gov/programs-surveys/cbp/data/datasets.html
 # * Documentation URL: https://www2.census.gov/programs-surveys/cbp/technical-documentation/records-layouts/2020_record_layouts/county-layout-2020.txt
 
-# In[168]:
+# In[205]:
 
 
 #Not in use at this checkpoint
@@ -87,7 +87,7 @@ cbp = pd.read_csv("./datasources/cbp20co.txt")
 # * Dataset URL: *You must create an account to access this*
 # * Documentation URL: https://www.feedingamerica.org/research/map-the-meal-gap/overall-executive-summary
 
-# In[169]:
+# In[206]:
 
 
 mmg_df_20_and_19 = pd.read_excel("./datasources/MMG2022_2020-2019Data_ToShare.xlsx", sheet_name="County", header=1, converters={0: str})
@@ -110,7 +110,7 @@ mmg_df_10 = pd.read_excel("./datasources/MMG2012_2010Data_ToShare.xlsx", sheet_n
 # * Dataset URL: https://api.census.gov/data/timeseries/poverty/saipe?
 # * Documentation URL: https://api.census.gov/data/timeseries/poverty/saipe/variables.html
 
-# In[170]:
+# In[207]:
 
 
 def get_api_data(year):
@@ -139,7 +139,7 @@ pov_df_20 = get_api_data("2020")
 # * Dataset URL: https://www.bls.gov/lau/
 # * Documentation URL: https://www.bls.gov/lau/
 
-# In[171]:
+# In[208]:
 
 
 #datset #4
@@ -164,7 +164,7 @@ bls_df_20 = pd.read_excel("./datasources/laucnty20.xlsx", sheet_name="laucnty20"
 # 
 # First, we need to drop unneeded columns to reduce the dataframes (DF) size. Since the MMG DFs have different columns for each dataset, we will need to drop them individually. We would also need to rename them to something that is more human-readable. Once the column headers are the same, we will need to add the year to each dataframe since the year is identified in the dataset file name, and that information is not available on a row level. We need to add it to the rows because we would merge all the dataframes on FIPS and year. Next, we need to concatenate all the individual MMG DFs into one. Once that is complete, I change the year to a float value on the concatenated MMG DF for EDA calculation reasons. In addition, we need to add leading 0's to the FIPS code since they were not padded in the dataset and are required for joins with other datasets. Finally, we multiply the FI rate to make it a percentage. 
 
-# In[172]:
+# In[209]:
 
 
 #Drop unneeded columns
@@ -218,7 +218,7 @@ mmg_df.sample(5)
 # 
 # We can start by merging all the BLS dataframes since their datasets contain the same column headers and names. Next, we need to drop the unneeded columns to reduce dataset size and remove information we do not need to analyze. We also need to rename the columns into something more readable in the bls_df dataframe. The FIPS codes in this dataset are split into state and county segments. We need to merge those FIPS codes to have one FIPS code, which is required to join other datasets. Once that is complete, we can drop the state and county FIPS columns since we have a single FIPS code column. Next, we must cast the year and unemployment rate as a float for EDA calculations. However, first, we need to remove nonnumerical values from the unemployment rate before we cast it to a float, or else it will throw an exception.
 
-# In[173]:
+# In[210]:
 
 
 #Concatenate frames, drop uneeded columns, rename the columns
@@ -241,7 +241,7 @@ bls_df.head()
 # 
 # Since all the datasets have the same column headers, we can concatenate them into a new dataframe and drop the columns we will not need. We will also need to rename them into something more readable. Finally, the API call we made returned all values under the string data type. Therefore, we need to convert the rest of the values other than FIPS to float.
 
-# In[174]:
+# In[211]:
 
 
 #Concat dataframes and drop uneeded columns, and rename
@@ -260,7 +260,7 @@ pov_df['year'] = pov_df['year'].astype(float)
 # 
 # Now that we have concatenated all the dataframes, the next step is to merge them, joined on fips and year. This will allow us to view the unemployment rate, food insecurity rate, poverty rate, and other values on one row where FIPS and year are the same. The rows will be inner joined to remove any null values.
 
-# In[175]:
+# In[212]:
 
 
 #Merging the datasets
@@ -272,7 +272,7 @@ master_df = master_df.merge(pov_df, how='inner', on=['fips', 'year'])
 
 # Below is descriptive information about the master dataframe. There would be no outliers unless we wanted to find the average population of a county since there are large population centers in the datframe.
 
-# In[176]:
+# In[213]:
 
 
 master_df.describe() 
@@ -280,7 +280,7 @@ master_df.describe()
 
 # Since we inner joined the datasets, there are no null values, as seen below. Therefore, we will not have to remove or fill any null values.
 
-# In[177]:
+# In[214]:
 
 
 master_df.isnull().sum()
@@ -288,7 +288,7 @@ master_df.isnull().sum()
 
 # As validated below, there are also no duplicate rows based on the year and FIPS.
 
-# In[178]:
+# In[215]:
 
 
 master_df[master_df.duplicated(['fips', 'year']) == True]
@@ -296,7 +296,7 @@ master_df[master_df.duplicated(['fips', 'year']) == True]
 
 # Below is an example of what a typical County looks like. In our example, we will use Hamilton county Ohio.
 
-# In[179]:
+# In[216]:
 
 
 master_df[master_df['fips'] == "39061"]
@@ -306,7 +306,7 @@ master_df[master_df['fips'] == "39061"]
 # 
 # Below is a correlation matrix of all the values in the master dataframe. Some of the values are closely correlated, like the unemployment rate and food insecurity rate. 
 
-# In[202]:
+# In[217]:
 
 
 ax = plt.axes()
@@ -316,7 +316,7 @@ ax.set_title('Combined Dataset Correlation Matrix')
 
 # In addition, we can also see the variation of the data using a box plot below, and this can help us identify any major outliers.
 
-# In[181]:
+# In[218]:
 
 
 ax = plt.axes()
@@ -326,7 +326,7 @@ ax.set_title('Combine Dataset Variation')
 
 # The chart below takes our values with the highest correlation found in the correlation matrix and plots them over time based on the mean of each value. The values have been scaled to the same magnitude—credit to Erica Forehand for this formula. 
 
-# In[182]:
+# In[219]:
 
 
 dfx = master_df.groupby(['year']).mean().reset_index()
@@ -353,7 +353,7 @@ fig.show()
 # 
 # Also, the median income and cost per meal are strongly correlated and have an inverse correlation to the unemployment rate, poverty rate, and food insecurity rate.
 
-# In[183]:
+# In[220]:
 
 
 mdf = master_df[master_df.year == 2015]
@@ -374,7 +374,7 @@ fig.show()
 
 # Above is choropleth map of 2015 food insecurity rates.
 
-# In[184]:
+# In[221]:
 
 
 fig = px.choropleth(master_df[master_df.year == 2010], geojson=counties, locations='fips', color='fi_rate',
@@ -390,7 +390,7 @@ fig.show()
 
 # Above, you can see a choropleth map for Food insecurity in 2010. This is a great way to visually represent the United States geography and show which areas are most impacted by food security. We can also create another choropleth map to compare food insecurity and unemployment by county in 2010 below.
 
-# In[185]:
+# In[222]:
 
 
 mdf = master_df[master_df.year == 2010]
@@ -407,7 +407,7 @@ fig.show()
 
 # In addition, we can also compare the 2010 unemployment rate choropleth map to the 2010 poverty choropleth map below.
 
-# In[186]:
+# In[223]:
 
 
 fig = px.choropleth(mdf, geojson=counties, locations='fips', color='pov_rate',
@@ -427,7 +427,7 @@ fig.show()
 # 
 # I will start by creating a copy of my merged dataframe below.
 
-# In[187]:
+# In[224]:
 
 
 fi_model = master_df.copy()
@@ -441,7 +441,7 @@ fi_model = master_df.copy()
 # 
 # Finally, the models and train/test splitting have a random state and seed set, so they should be consistent across all runs.
 
-# In[203]:
+# In[225]:
 
 
 fi_train_set, fi_test_set = train_test_split(fi_model, random_state=42, test_size=0.2)
@@ -451,7 +451,7 @@ fi_y = fi_train_set['fi_rate'].copy()
 
 # The model pipeline below contains the steps to fit and transform my fi_model. First, we will use a custom transformer to get engineered features like the total population derived from tot_pop_pov and pov_rate. Next, we use a simple imputer and standard scaler to improve our prepared model's output further. The standard scaler was very important for this project due to the range of data.
 
-# In[189]:
+# In[226]:
 
 
 num_features = fi_X.columns
@@ -479,7 +479,7 @@ fi_X_prepared = full_pipeline.fit_transform(fi_X)
 
 # I tested multiple regressors and attained the lowest RMSE score and best CV using the Random Forest Regressor. In addition, I have attempted to tune it with some hyperparameters. This is the best model for predicting our target food insecurity rate.
 
-# In[190]:
+# In[227]:
 
 
 rfr = Pipeline([
@@ -490,7 +490,7 @@ rfr.fit(fi_X_prepared, fi_y)
 
 # Finding the training set RMSE below.
 
-# In[191]:
+# In[228]:
 
 
 predictions = rfr.predict(fi_X_prepared)
@@ -501,7 +501,7 @@ print('The Train Random Forest Regressor RMSE:', rfr_rmse)
 
 # Finding the predictive model Cross Validation score below.
 
-# In[192]:
+# In[229]:
 
 
 kfold = KFold(n_splits=10)
@@ -511,7 +511,7 @@ print('The Mean Random Forest Regressor CV Score:', abs(np.mean(scores)))
 
 # Testing set RMSE below.
 
-# In[193]:
+# In[230]:
 
 
 fi_test_X = fi_test_set.drop(['fi_rate', 'county_name', 'fips', 'year', 'cost_per_meal'], axis=1)
@@ -527,7 +527,7 @@ print('The Test Random Forest Regressor RMSE:', test_rfr_rmse)
 # 
 # In addition, I also compared the actuals of 2020 to the predictions of a similar trained model, where I removed data from the year 2020. The best model contains training data from 2010 - 2020, whereas the no2020 contains training data from 2010-2019. I did this to test how well the regression model worked when the data we were trying to predict was not included in the training. However, this model slightly overestimates low food insecurity rates.
 
-# In[194]:
+# In[231]:
 
 
 fi_model_no2020  = master_df[master_df['year'] != 2020]
@@ -562,7 +562,7 @@ rfr_no2020.fit(fi_X_prepared_no2020, fi_y_no2020)
 
 # The code below creates a table of the actual food insecurity rates for 2020 vs. the predicted food insecurity of 2020 using my best model vs. the predicted food insecurity rate of 2020 using a clone of my best model that was not trained on 2020 data.
 
-# In[195]:
+# In[242]:
 
 
 fi_2020 = master_df[master_df['year'] == 2020]
@@ -590,7 +590,7 @@ print('The mean error for the best model without 2020 training data is', round(c
 
 # ### 2020 Actual Food Insecurity Map
 
-# In[196]:
+# In[233]:
 
 
 fig = px.choropleth(comp_df, geojson=counties, locations='fips', color='fi_rate',
@@ -606,7 +606,7 @@ fig.show()
 
 # ### 2020 Machine Learning Model Predicting Food Insecurity Map
 
-# In[197]:
+# In[234]:
 
 
 fig = px.choropleth(comp_df, geojson=counties, locations='fips', color='pred_fi',
@@ -624,7 +624,7 @@ fig.show()
 # 
 # Since the previous map predicted 2020 actuals based on trained data from 2010 - 2020, I also wanted to create another trained model (2010 - 2019) that was not fitted with 2020 data and see how it predicts 2020 food insecurity, and you can see the results below. However, it does tend to overestimate counties with low food insecurity and predicts them to be higher than their actual (dark blue). I believe this is due to the unemployment spike from the COVID pandemic (2020), where food insecurity followed the mean yearly trend while unemployment rose and in which training data relating to that was purposely removed from this model. The regression model above would do a better job of predicting food insecurity with the COVID unemployment spike. It is challenging to create a model that predicts food insecurity given the COVID pandemic, emergency governmental support programs, and how it adjusted poverty and unemployment trends related to food insecurity. I would eventually like to adjust for this bias in further development.
 
-# In[198]:
+# In[235]:
 
 
 fig = px.choropleth(comp_df, geojson=counties, locations='fips', color='pred_fi_no2020',
@@ -640,7 +640,7 @@ fig.show()
 
 # Below is an example of how you can predict a county's food insecurity at an ad hoc level. However, there is not enough poverty or unemployment data since 2020 to make these predictions.
 
-# In[199]:
+# In[236]:
 
 
 pred = pd.DataFrame({
@@ -657,14 +657,14 @@ print(rfr.predict(pred_trans))
 # 
 # ***DO COMMIT THESE FILES, THEY ARE TOO LARGE FOR GITHUB.***
 
-# In[200]:
+# In[237]:
 
 
 #pickle.dump(master_df, file=open('all_features.pkl', 'wb'))
 #pickle.dump(rfr, file=open('predictive_model.pkl', 'wb'))
 
 
-# In[201]:
+# In[243]:
 
 
 get_ipython().system('jupyter nbconvert --to python source.ipynb')

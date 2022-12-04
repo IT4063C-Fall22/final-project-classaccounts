@@ -10,9 +10,13 @@ I created this README as a TLDR for my notebook with my main findings. Please en
 
 I am trying to address food insecurity in the United States and identify geographic areas where food programs like the Supplemental Nutrition Assistance Program (SNAP), Special Supplemental Nutrition Program for Women (WIC),  National School Lunch Program (NSLP), and Emergency Food Assistance Program (TEFAP) could be targeted. Those organizations allocate funding based on geographic areas with the greatest need. Therefore, it is essential to address this issue to ensure the right communities get the proper support through these programs to alleviate many health disparities caused by poor nutrition and food insecurity (FI).
 
+*Oxford defines food insecurity as: "The state of being without reliable access to a sufficient quantity of affordable, nutritious food."*
+
+*The USDA defines food insecurity as: "A lack of consistent access to enough food for every person in a household to live an active, healthy life."*
+
 ## Project Question
 
-* Which counties of the united states are most impacted by food insecurity, and what indicators like business patterns, houselessness, and income are correlated to it?
+* Which counties of the United States are most impacted by food insecurity, and what indicators like unemployment, poverty, and income are correlated to it?
 * How can we predict food insecurity in the future?
 
 ## What would an answer look like?
