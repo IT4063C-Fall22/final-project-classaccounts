@@ -21,7 +21,7 @@
 # 
 # *The USDA defines food insecurity as: "A lack of consistent access to enough food for every person in a household to live an active, healthy life."*
 # 
-# ## Project Question
+# ## Project Questions
 # 
 # * Which counties of the United States are most impacted by food insecurity, and what indicators like poverty, unemployment, and income are correlated to it?
 # * How can we predict food insecurity in the future?
@@ -668,7 +668,7 @@ print(rfr.predict(pred_trans))
 #pickle.dump(rfr, file=open('predictive_model.pkl', 'wb'))
 
 
-# In[245]:
+# In[246]:
 
 
 get_ipython().system('jupyter nbconvert --to python source.ipynb')
