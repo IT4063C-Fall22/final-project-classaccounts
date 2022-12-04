@@ -1,6 +1,8 @@
 
 # Finding Food Insecurity
 
+This README was created as a TLDR for my notebook with my main findings. Please ensure you run and explore the interactive graphs on the notebook and view my iterative process in building the final model.
+
 ## Installing Dependencies
 
 - run `pipenv install`.
@@ -16,7 +18,7 @@ I am trying to address food insecurity in the United States and identify geograp
 
 ## What would an answer look like?
 
-The essential deliverable would be a choropleth map (code example included) showing the food insecurity index (FII) rate of each country in the United States. I would also have supporting line charts showing the FII rates compared to other indicators like povety and unemployment. The great thing about relating my dataset using Federal Information Processing Standards (FIPS) is that I can incorporate more datasets to correlate them to the FII of each county. Therefore, I believe I could have multiple answers to my question depending on what indicator correlated to FII we want to look at through exploratory data analysis. This would allow me to create very concrete answers for my question. Eventually, I would like to predict food insecurity based on these indicators. I can undoubtedly relate those indicators and likely correlate them to my FII per county.
+The essential deliverable would be a choropleth map (code example included) showing the food insecurity index (FII) rate of each country in the United States. I would also have supporting line charts showing the FII rates compared to other indicators like poverty and unemployment. The great thing about relating my dataset using Federal Information Processing Standards (FIPS) is that I can incorporate more datasets to correlate them to the FII of each county. Therefore, I believe I could have multiple answers to my question depending on what indicator correlated to FII we want to look at through exploratory data analysis. This would allow me to create very concrete answers for my questions. Eventually, I would like to predict food insecurity based on these indicators. I can undoubtedly relate those indicators and likely correlate them to my FII per county.
 
 ## Data Sources
 
@@ -29,11 +31,21 @@ I have identified and imported four datasets for this project. However, I decide
 
 These datasets can be related using the FIPS code, which can indicate the county each row pertains to. All of these datasets I've imported contain a FIPS code. Therefore, I can join each of them using the county segment of the FIPS code.
 
-I will explore their relations in the EDA section of this notebook. However, I will need to clean and merge the datasets first.
+I will explore their relations in the Exploratory Data Analysis (EDA) section of this notebook. However, I will need to clean and merge the datasets first.
 
 Please see more information regarding the datasets in the Jupyter notebook.
 
-## Results TALK ABOUT PANDEMIC DATA (REMOVE)
+## EDA
+
+When I merged the datasets I plotted a correlation matrix of all the features from my combined dataset to which features I would want to start with building my model.
+
+![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/corr_matrix.png?raw=true)
+
+I also plotted the mean value of the most correlated features to see if they have a linear relationship, and use them as part of my regression model. The features are scaled to the same magnitude to better identify their trends. Please note, the unemployment rate spikes but food insecurity decreases. This spike was due to the COVID-19 pandemic. You would expect food insecurity to also increase, but it did not follow the previously established linear realtionship because up emergency supplemental programs.
+
+![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/scaled_mean_value_trends.png?raw=true)
+
+## Modeling & Results 
 
 I was able to successfully create a Machine Learning model that can predict food insecurity rates for a given county in the United States and answer my project questions. I will demonstrate this with the following choropleth maps. To see how I reached these results, please run my notebook and walk through each step from data preparation/cleaning, EDA, to ML modeling.
 
@@ -51,6 +63,6 @@ Please be sure to check out the interactive maps on the notebook, so you can vie
 
 ![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/2020_prediction.png?raw=true)
 ### 2020 Machine Learning Model Predicting Food Insecurity Map Without 2020 Training Data
-Since the previous map was predicting 2020 actuals based on trained data from 2010 - 2020, I also wanted to create another trained model (2010 - 2019) that was not fitted with 2020 data and see how it performs predicting 2020 food insecurity, you can see the results below. However, it does tend to overestimate counties with low food insecurity and predicts them to be higher than their actual (dark blue). I believe this is due to the unemployment spike from the COVID pandemic (2020) where food insecurity followed the mean yearly trend while unemployment rose and in which training data relating to that was purposely removed from this model. The regression model above would do a better job of predicting food insecurity with the COVID unemployment spike. It is very difficult to create a model that predicts food insecurity given the COVID pandemic, emergency governmental support programs, and how it adjusted poverty and unemployment trends related to food inescurity.
+Since the previous map was predicting 2020 actuals based on trained data from 2010 - 2020, I also wanted to create another trained model (2010 - 2019) that was not fitted with 2020 data and see how it performs predicting 2020 food insecurity, you can see the results below. However, it does tend to overestimate counties with low food insecurity and predicts them to be higher than their actual (dark blue). I believe this is due to the unemployment spike from the COVID pandemic (2020) where food insecurity followed the mean yearly trend while unemployment rose and in which training data relating to that was purposely removed from this model. The regression model above would do a better job of predicting food insecurity with the COVID unemployment spike. It is very difficult to create a model that predicts food insecurity given the COVID pandemic, emergency governmental support programs, and how it adjusted poverty and unemployment trends related to food insecurity. I would eventually like to adjust for this bias in further development.
 
 ![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/2020_prediction_no2020train.png?raw=true)
