@@ -45,9 +45,12 @@ The interactive graphs in the results section of my notebook answer the followin
 Please be sure to check out the interactive maps on the notebook, so you can view specific county food insecurity rates.
 
 ### 2020 Actual Food Insecurity Map
+
 ![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/2020_actual.png?raw=true)
 ### 2020 Machine Learning Model Predicted Food Insecurity Map
+
 ![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/2020_prediction.png?raw=true)
 ### 2020 Machine Learning Model Predicting Food Insecurity Map Without 2020 Training Data
-Since the previous map was predicting 2020 actuals based on trained data from 2010 - 2020, I also wanted to create another trained model (2010 - 2019) that was not fitted with 2020 data and see how it performs predicting 2020 food insecurity, you can see the results below.
+Since the previous map was predicting 2020 actuals based on trained data from 2010 - 2020, I also wanted to create another trained model (2010 - 2019) that was not fitted with 2020 data and see how it performs predicting 2020 food insecurity, you can see the results below. However, it does tend to overestimate counties with low food insecurity and predicts them to be higher than their actual (dark blue). I believe this is due to the unemployment spike from the COVID pandemic (2020) where food insecurity followed the mean yearly trend while unemployment rose and in which training data relating to that was purposely removed from this model. The regression model above would do a better job of predicting food insecurity with the COVID unemployment spike.
+
 ![alt text](https://github.com/IT4063C-Fall22/final-project-classaccounts/blob/main/images/2020_prediction_no2020train.png?raw=true)
